@@ -126,45 +126,85 @@ class MoreScreen extends StatelessWidget {
   void _showMinistryDetail(BuildContext context, Ministry ministry) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => Padding(
-        padding: const EdgeInsets.all(24),
+      builder: (_) => SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              children: [
-                Text(ministry.emoji,
-                    style: const TextStyle(fontSize: 32)),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            // Ministry photo
+            ClipRRect(
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(20)),
+              child: Image.network(
+                ministry.imageUrl,
+                width: double.infinity,
+                height: 200,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stack) => Container(
+                  height: 200,
+                  color: AppTheme.background,
+                  child: const Center(
+                      child: Icon(Icons.group,
+                          size: 64, color: AppTheme.primary)),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Text(
-                        ministry.name,
-                        style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.primary),
-                      ),
-                      Text(
-                        'Led by ${ministry.leader}',
-                        style: const TextStyle(
-                            color: Colors.grey, fontSize: 13),
+                      Text(ministry.emoji,
+                          style: const TextStyle(fontSize: 28)),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          ministry.name,
+                          style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.primary),
+                        ),
                       ),
                     ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 6),
+                  Text(
+                    'Led by ${ministry.leader}',
+                    style: const TextStyle(
+                        color: Colors.grey, fontSize: 13),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(ministry.description,
+                      style: const TextStyle(height: 1.5)),
+                  const SizedBox(height: 16),
+                  InkWell(
+                    onTap: () =>
+                        _launchEmail(ministry.email),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.email_outlined,
+                            color: AppTheme.primary, size: 18),
+                        const SizedBox(width: 8),
+                        Text(
+                          ministry.email,
+                          style: const TextStyle(
+                              color: AppTheme.primary,
+                              decoration: TextDecoration.underline),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              ),
             ),
-            const SizedBox(height: 16),
-            Text(ministry.description,
-                style: const TextStyle(height: 1.5)),
-            const SizedBox(height: 24),
           ],
         ),
       ),
