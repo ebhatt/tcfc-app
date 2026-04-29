@@ -1,0 +1,24 @@
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "tcfc-va",
+          "appId": "1:747700058341:android:d1cd46c7c23d588e807c0c",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "tcfc-va",
+          "configurations": {
+            "android": "1:747700058341:android:d1cd46c7c23d588e807c0c"
+          }
+        }
+      }
+    }
+  }
+}

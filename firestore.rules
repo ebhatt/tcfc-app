@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isLeader() {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'leader';
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // Users can read/write their own document; leaders can read all
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isLeader();
+      allow write: if isOwner(uid);
+    }
+
+    // Events: anyone can read, only leaders can write
+    match /events/{eventId} {
+      allow read: if true;
+      allow create, update, delete: if isLeader();
+    }
+
+    // Prayer requests:
+    // - Public: anyone can read; authenticated users can create
+    // - Private: only leaders and author can read
+    // - Only author or leader can delete
+    // - Only prayingCount and prayingUids fields can be updated by signed-in users
+    match /prayerRequests/{requestId} {
+      allow read: if resource.data.visibility == 'public'
+                  || isLeader()
+                  || isOwner(resource.data.authorUid);
+      allow create: if isSignedIn();
+      allow delete: if isOwner(resource.data.authorUid) || isLeader();
+      allow update: if isSignedIn() &&
+                      request.resource.data.diff(resource.data).affectedKeys()
+                        .hasOnly(['prayingCount', 'prayingUids']);
+    }
+  }
+}
