@@ -1,0 +1,25 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /Users/eugene/Documents/ai-projects/tcfc-app && dart format lib/ test/ 2>&1 | tail -3"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /Users/eugene/Documents/ai-projects/tcfc-app && flutter analyze 2>&1 | tail -15"
+          }
+        ]
+      }
+    ]
+  }
+}
