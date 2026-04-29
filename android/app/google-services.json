@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "747700058341",
+    "project_id": "tcfc-va",
+    "storage_bucket": "tcfc-va.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:747700058341:android:d1cd46c7c23d588e807c0c",
+        "android_client_info": {
+          "package_name": "com.tcfcva.tcfc_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQnCBXSqvYHSmmZaQRIHh-rIWITGv0UWU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
