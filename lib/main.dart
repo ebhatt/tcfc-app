@@ -1,7 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'firebase_options.dart';
+import 'providers/auth_provider.dart';
+import 'screens/auth_gate.dart';
+import 'services/auth_service.dart';
 import 'theme.dart';
 
 void main() async {
@@ -15,12 +19,17 @@ class TcfcApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'TCFC VA',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.theme,
-      home: const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => AuthProvider(AuthService()),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'TCFC VA',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.theme,
+        home: const AuthGate(),
       ),
     );
   }
