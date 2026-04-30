@@ -48,9 +48,9 @@ class _MainShellState extends State<MainShell> {
             label: 'Prayer',
           ),
           NavigationDestination(
-            icon: Icon(Icons.more_horiz_outlined),
-            selectedIcon: Icon(Icons.more_horiz),
-            label: 'More',
+            icon: Icon(Icons.people_outline),
+            selectedIcon: Icon(Icons.people),
+            label: 'Ministries',
           ),
         ],
       ),

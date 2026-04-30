@@ -16,12 +16,15 @@ service cloud.firestore {
     }
 
     // Users can read/write their own document; leaders can read all
+    // Leaders can also update only the role field on any user document
     match /users/{uid} {
       allow read: if isOwner(uid) || isLeader();
       allow write: if isOwner(uid);
+      allow update: if isLeader() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role']);
     }
 
-    // Events: anyone can read, only leaders can write
+    // Events: anyone can read, only leaders (incl. ministry leaders) can write
     match /events/{eventId} {
       allow read: if true;
       allow create, update, delete: if isLeader();

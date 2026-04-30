@@ -21,6 +21,10 @@ class EventCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final dateStr = DateFormat('MMM d').format(event.date);
     final dayStr = DateFormat('EEE').format(event.date);
+    final subtitleStr = event.endDate != null
+        ? '${DateFormat('MMM d').format(event.date)}–'
+            '${DateFormat('MMM d').format(event.endDate!)} · ${event.location}'
+        : '${event.time} · ${event.location}';
 
     Widget card = Card(
       child: InkWell(
@@ -73,7 +77,7 @@ class EventCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '${event.time} · ${event.location}',
+                      subtitleStr,
                       style:
                           const TextStyle(color: Colors.grey, fontSize: 12),
                     ),
@@ -100,6 +104,24 @@ class EventCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
           ),
           child: const Icon(Icons.delete, color: Colors.white),
+        ),
+        confirmDismiss: (_) => showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Delete Event'),
+            content: Text('Delete "${event.title}"?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                onPressed: () => Navigator.pop(ctx, true),
+                child: const Text('Delete'),
+              ),
+            ],
+          ),
         ),
         onDismissed: (_) => onDelete?.call(),
         child: card,

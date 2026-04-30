@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../constants.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme.dart';
+import 'admin_screen.dart';
 
 class MoreScreen extends StatelessWidget {
   const MoreScreen({super.key});
@@ -23,7 +24,7 @@ class MoreScreen extends StatelessWidget {
     final auth = context.watch<AuthProvider>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('More')),
+      appBar: AppBar(title: const Text('Ministries')),
       body: ListView(
         children: [
           // Ministries
@@ -31,7 +32,10 @@ class MoreScreen extends StatelessWidget {
           ...AppConstants.ministries.map((m) => ListTile(
                 leading: Text(m.emoji,
                     style: const TextStyle(fontSize: 22)),
-                title: Text(m.name,
+                title: Text(
+                    m.name == 'Church Pastor'
+                        ? m.name
+                        : '${m.name} Lead',
                     style: const TextStyle(fontWeight: FontWeight.w600)),
                 subtitle: Text(m.leader,
                     style: const TextStyle(
@@ -97,12 +101,24 @@ class MoreScreen extends StatelessWidget {
               title: Text(auth.currentUser!.displayName),
               subtitle: Text(auth.currentUser!.email),
             ),
-            if (auth.isLeader)
+            if (auth.isLeader) ...[
               const ListTile(
                 leading: Icon(Icons.star, color: AppTheme.accent),
                 title: Text('Church Leader',
                     style: TextStyle(color: AppTheme.primary)),
               ),
+              ListTile(
+                leading: const Icon(Icons.admin_panel_settings,
+                    color: AppTheme.primary),
+                title: const Text('Manage Members'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const AdminScreen()),
+                ),
+              ),
+            ],
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.red),
               title: const Text('Sign Out',
@@ -139,19 +155,27 @@ class MoreScreen extends StatelessWidget {
             ClipRRect(
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(20)),
-              child: Image.network(
-                ministry.imageUrl,
-                width: double.infinity,
-                height: 200,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stack) => Container(
-                  height: 200,
-                  color: AppTheme.background,
-                  child: const Center(
-                      child: Icon(Icons.group,
-                          size: 64, color: AppTheme.primary)),
-                ),
-              ),
+              child: ministry.imageUrl.isEmpty
+                  ? Container(
+                      height: 200,
+                      width: double.infinity,
+                      color: AppTheme.background,
+                      child: const Center(
+                          child: Icon(Icons.group,
+                              size: 64, color: AppTheme.primary)),
+                    )
+                  : Image.network(
+                      ministry.imageUrl,
+                      width: double.infinity,
+                      fit: BoxFit.fitWidth,
+                      errorBuilder: (context, error, stack) => Container(
+                        height: 200,
+                        color: AppTheme.background,
+                        child: const Center(
+                            child: Icon(Icons.group,
+                                size: 64, color: AppTheme.primary)),
+                      ),
+                    ),
             ),
             Padding(
               padding: const EdgeInsets.all(24),
@@ -165,7 +189,9 @@ class MoreScreen extends StatelessWidget {
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          ministry.name,
+                          ministry.name == 'Church Pastor'
+                              ? ministry.name
+                              : '${ministry.name} Lead',
                           style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -176,7 +202,7 @@ class MoreScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Led by ${ministry.leader}',
+                    ministry.leader,
                     style: const TextStyle(
                         color: Colors.grey, fontSize: 13),
                   ),

@@ -24,6 +24,17 @@ dev_dependencies:
   fake_cloud_firestore: ^3.0.3
   firebase_auth_mocks: ^0.14.1
   mocktail: ^1.0.4
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/images/tcfc_logo.png"
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "assets/images/tcfc_logo.png"
+  min_sdk_android: 21
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/

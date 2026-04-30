@@ -26,8 +26,12 @@ class _EventsScreenState extends State<EventsScreen> {
   }
 
   List<Event> _filteredEvents(List<Event> all) {
-    if (_selectedDay == null) return all;
-    return _eventsForDay(all, _selectedDay!);
+    if (_selectedDay != null) return _eventsForDay(all, _selectedDay!);
+    return all
+        .where((e) =>
+            e.date.year == _focusedDay.year &&
+            e.date.month == _focusedDay.month)
+        .toList();
   }
 
   @override
@@ -73,8 +77,10 @@ class _EventsScreenState extends State<EventsScreen> {
                     _focusedDay = focused;
                   });
                 },
-                onPageChanged: (focused) =>
-                    setState(() => _focusedDay = focused),
+                onPageChanged: (focused) => setState(() {
+                  _focusedDay = focused;
+                  _selectedDay = null;
+                }),
               ),
               const Divider(height: 1),
               Expanded(
@@ -83,7 +89,7 @@ class _EventsScreenState extends State<EventsScreen> {
                         child: Text(
                           _selectedDay != null
                               ? 'No events on this day'
-                              : 'No upcoming events',
+                              : 'No events this month',
                           style: const TextStyle(color: Colors.grey),
                         ),
                       )

@@ -5,6 +5,8 @@ class Event {
   final String title;
   final DateTime date;
   final String time;
+  final DateTime? endDate;
+  final String? endTime;
   final String description;
   final String location;
   final String createdBy;
@@ -15,6 +17,8 @@ class Event {
     required this.title,
     required this.date,
     required this.time,
+    this.endDate,
+    this.endTime,
     required this.description,
     required this.location,
     required this.createdBy,
@@ -28,6 +32,10 @@ class Event {
       title: data['title'] as String,
       date: (data['date'] as Timestamp).toDate(),
       time: data['time'] as String,
+      endDate: data['endDate'] != null
+          ? (data['endDate'] as Timestamp).toDate()
+          : null,
+      endTime: data['endTime'] as String?,
       description: data['description'] as String,
       location: data['location'] as String,
       createdBy: data['createdBy'] as String,
@@ -35,13 +43,18 @@ class Event {
     );
   }
 
-  Map<String, dynamic> toMap() => {
-        'title': title,
-        'date': Timestamp.fromDate(date),
-        'time': time,
-        'description': description,
-        'location': location,
-        'createdBy': createdBy,
-        'createdAt': Timestamp.fromDate(createdAt),
-      };
+  Map<String, dynamic> toMap() {
+    final map = <String, dynamic>{
+      'title': title,
+      'date': Timestamp.fromDate(date),
+      'time': time,
+      'description': description,
+      'location': location,
+      'createdBy': createdBy,
+      'createdAt': Timestamp.fromDate(createdAt),
+    };
+    if (endDate != null) map['endDate'] = Timestamp.fromDate(endDate!);
+    if (endTime != null) map['endTime'] = endTime;
+    return map;
+  }
 }

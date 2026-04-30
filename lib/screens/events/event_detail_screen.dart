@@ -1,18 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../../models/event.dart';
+import '../../providers/auth_provider.dart';
 import '../../theme.dart';
+import 'add_event_screen.dart';
 
 class EventDetailScreen extends StatelessWidget {
   final Event event;
 
   const EventDetailScreen({super.key, required this.event});
 
+  String _dateRangeStr(Event e) {
+    final start = DateFormat('EEEE, MMMM d, y').format(e.date);
+    if (e.endDate == null) return start;
+    // Same year — omit year from start date
+    final startShort = DateFormat('EEEE, MMMM d').format(e.date);
+    final end = DateFormat('EEEE, MMMM d, y').format(e.endDate!);
+    return '$startShort – $end';
+  }
+
+  String _timeRangeStr(Event e) {
+    if (e.endTime == null) return e.time;
+    return '${e.time} – ${e.endTime}';
+  }
+
   @override
   Widget build(BuildContext context) {
-    final dateStr = DateFormat('EEEE, MMMM d, y').format(event.date);
+    final isLeader = context.watch<AuthProvider>().isLeader;
     return Scaffold(
-      appBar: AppBar(title: const Text('Event Details')),
+      appBar: AppBar(
+        title: const Text('Event Details'),
+        actions: [
+          if (isLeader)
+            IconButton(
+              icon: const Icon(Icons.edit_outlined),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => AddEventScreen(event: event),
+                ),
+              ),
+            ),
+        ],
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -26,8 +57,10 @@ class EventDetailScreen extends StatelessWidget {
                   color: AppTheme.primary),
             ),
             const SizedBox(height: 20),
-            _DetailRow(icon: Icons.calendar_today, text: dateStr),
-            _DetailRow(icon: Icons.access_time, text: event.time),
+            _DetailRow(
+                icon: Icons.calendar_today, text: _dateRangeStr(event)),
+            _DetailRow(
+                icon: Icons.access_time, text: _timeRangeStr(event)),
             _DetailRow(icon: Icons.location_on, text: event.location),
             if (event.description.isNotEmpty) ...[
               const SizedBox(height: 20),
@@ -59,8 +92,12 @@ class _DetailRow extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: AppTheme.primary, size: 20),
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(icon, color: AppTheme.primary, size: 20),
+          ),
           const SizedBox(width: 12),
           Expanded(child: Text(text)),
         ],
