@@ -3,94 +3,93 @@ import 'package:provider/provider.dart';
 import '../../models/prayer_request.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/prayer_service.dart';
+import '../../theme.dart';
 import '../../widgets/prayer_card.dart';
 import 'submit_prayer_screen.dart';
 
-class PrayerScreen extends StatefulWidget {
+class PrayerScreen extends StatelessWidget {
   const PrayerScreen({super.key});
-
-  @override
-  State<PrayerScreen> createState() => _PrayerScreenState();
-}
-
-class _PrayerScreenState extends State<PrayerScreen>
-    with SingleTickerProviderStateMixin {
-  final _prayerService = PrayerService();
-  late final TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
-    final isLeader = auth.isLeader;
+    final isPastor = auth.isPastor;
+    final isPrayerMinistry = auth.isPrayerMinistry;
+    final prayerService = PrayerService();
     final uid = auth.currentUser?.uid;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Prayer Requests'),
-        bottom: isLeader
-            ? TabBar(
-                controller: _tabController,
-                labelColor: Colors.white,
-                unselectedLabelColor: Colors.white60,
-                indicatorColor: Colors.white,
-                tabs: const [
-                  Tab(text: 'Congregation'),
-                  Tab(text: 'Private'),
-                ],
-              )
-            : null,
+        title: Text(isPastor
+            ? 'Prayer Inbox — Pastor'
+            : isPrayerMinistry
+                ? 'Prayer Inbox — Prayer Ministry'
+                : 'Prayer'),
       ),
-      body: isLeader
-          ? TabBarView(
-              controller: _tabController,
-              children: [
-                _RequestList(
-                    stream: _prayerService.watchPublicRequests(),
-                    uid: uid,
-                    prayerService: _prayerService,
-                    canPray: auth.isLoggedIn),
-                _RequestList(
-                    stream: _prayerService.watchPrivateRequests(),
-                    uid: uid,
-                    prayerService: _prayerService,
-                    canPray: false),
-              ],
-            )
-          : _RequestList(
-              stream: _prayerService.watchPublicRequests(),
+      body: (isPastor || isPrayerMinistry)
+          ? _RequestList(
+              stream: isPastor
+                  ? prayerService.watchPastorRequests()
+                  : prayerService.watchPrayerMinistryRequests(),
               uid: uid,
-              prayerService: _prayerService,
-              canPray: auth.isLoggedIn),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          if (!auth.isLoggedIn) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text('Sign in to submit a prayer request')));
-            return;
-          }
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => SubmitPrayerScreen(
-                authorName: auth.currentUser!.displayName,
-                authorUid: auth.currentUser!.uid,
+              prayerService: prayerService,
+            )
+          : _SubmitPrompt(isLoggedIn: auth.isLoggedIn),
+      floatingActionButton: auth.isLoggedIn
+          ? FloatingActionButton(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => SubmitPrayerScreen(
+                    authorName: auth.currentUser!.displayName,
+                    authorUid: auth.currentUser!.uid,
+                  ),
+                ),
               ),
+              child: const Icon(Icons.add),
+            )
+          : null,
+    );
+  }
+}
+
+class _SubmitPrompt extends StatelessWidget {
+  final bool isLoggedIn;
+  const _SubmitPrompt({required this.isLoggedIn});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.volunteer_activism,
+                size: 48, color: AppTheme.primary),
+            const SizedBox(height: 16),
+            const Text(
+              'Submit a Prayer Request',
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.primary),
             ),
-          );
-        },
-        child: const Icon(Icons.add),
+            const SizedBox(height: 12),
+            const Text(
+              'Your request will be sent privately to our Pastor or Prayer Ministry team.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey, height: 1.5),
+            ),
+            if (!isLoggedIn) ...[
+              const SizedBox(height: 12),
+              const Text(
+                'Sign in to submit a request.',
+                style: TextStyle(color: Colors.grey, fontSize: 13),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -100,13 +99,11 @@ class _RequestList extends StatelessWidget {
   final Stream<List<PrayerRequest>> stream;
   final String? uid;
   final PrayerService prayerService;
-  final bool canPray;
 
   const _RequestList({
     required this.stream,
     required this.uid,
     required this.prayerService,
-    required this.canPray,
   });
 
   @override
@@ -133,7 +130,7 @@ class _RequestList extends StatelessWidget {
             return PrayerCard(
               request: req,
               isPraying: isPraying,
-              canPray: canPray,
+              canPray: uid != null,
               onTogglePraying: () =>
                   prayerService.togglePraying(req.id, uid!, !isPraying),
             );

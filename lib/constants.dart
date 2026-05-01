@@ -33,6 +33,8 @@ class AppConstants {
   static const String churchAddress =
       '21740 Beaumeade Circle, Suite 115, Ashburn, VA 20147';
   static const String churchEmail = 'connect@tcfcva.com';
+  static const String pastorEmail = 'pastor@tcfcva.com';
+  static const String prayerMinistryEmail = 'prayerministry@tcfcva.com';
   static const String churchPhone = '+1 (301) 237-0656';
   static const String churchPhoneUrl = 'tel:+13012370656';
   static const String websiteUrl = 'https://www.tcfcva.com';

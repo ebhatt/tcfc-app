@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import '../constants.dart';
 import '../models/app_user.dart';
 import '../services/auth_service.dart';
 
@@ -18,6 +19,10 @@ class AuthProvider extends ChangeNotifier {
   bool get isLoading => _loading;
   bool get isLoggedIn => _currentUser != null;
   bool get isLeader => _currentUser?.isLeader ?? false;
+  bool get isPastor =>
+      _currentUser?.email == AppConstants.pastorEmail;
+  bool get isPrayerMinistry =>
+      _currentUser?.email == AppConstants.prayerMinistryEmail;
   String? get error => _error;
 
   Future<void> _onAuthStateChanged(User? firebaseUser) async {

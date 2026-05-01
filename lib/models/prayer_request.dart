@@ -5,7 +5,7 @@ class PrayerRequest {
   final String text;
   final String authorName;
   final String authorUid;
-  final String visibility;
+  final String recipient;
   final int prayingCount;
   final List<String> prayingUids;
   final DateTime timestamp;
@@ -15,13 +15,13 @@ class PrayerRequest {
     required this.text,
     required this.authorName,
     required this.authorUid,
-    required this.visibility,
+    required this.recipient,
     required this.prayingCount,
     required this.prayingUids,
     required this.timestamp,
   });
 
-  bool get isPublic => visibility == 'public';
+  bool get isPrayerMinistry => recipient == 'prayer_ministry';
 
   factory PrayerRequest.fromDoc(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
@@ -30,7 +30,7 @@ class PrayerRequest {
       text: data['text'] as String,
       authorName: data['authorName'] as String,
       authorUid: data['authorUid'] as String,
-      visibility: data['visibility'] as String,
+      recipient: data['recipient'] as String? ?? 'prayer_ministry',
       prayingCount: data['prayingCount'] as int? ?? 0,
       prayingUids:
           List<String>.from(data['prayingUids'] as List? ?? const []),
@@ -42,7 +42,7 @@ class PrayerRequest {
         'text': text,
         'authorName': authorName,
         'authorUid': authorUid,
-        'visibility': visibility,
+        'recipient': recipient,
         'prayingCount': prayingCount,
         'prayingUids': prayingUids,
         'timestamp': Timestamp.fromDate(timestamp),

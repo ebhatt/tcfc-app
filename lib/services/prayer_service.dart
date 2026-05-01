@@ -7,19 +7,19 @@ class PrayerService {
   PrayerService({FirebaseFirestore? firestore})
       : _firestore = firestore ?? FirebaseFirestore.instance;
 
-  Stream<List<PrayerRequest>> watchPublicRequests() {
+  Stream<List<PrayerRequest>> watchPrayerMinistryRequests() {
     return _firestore
         .collection('prayerRequests')
-        .where('visibility', isEqualTo: 'public')
+        .where('recipient', isEqualTo: 'prayer_ministry')
         .orderBy('timestamp', descending: true)
         .snapshots()
         .map((snap) => snap.docs.map(PrayerRequest.fromDoc).toList());
   }
 
-  Stream<List<PrayerRequest>> watchPrivateRequests() {
+  Stream<List<PrayerRequest>> watchPastorRequests() {
     return _firestore
         .collection('prayerRequests')
-        .where('visibility', isEqualTo: 'private')
+        .where('recipient', isEqualTo: 'pastor')
         .orderBy('timestamp', descending: true)
         .snapshots()
         .map((snap) => snap.docs.map(PrayerRequest.fromDoc).toList());
@@ -29,13 +29,13 @@ class PrayerService {
     required String text,
     required String authorName,
     required String authorUid,
-    required String visibility,
+    required String recipient,
   }) {
     return _firestore.collection('prayerRequests').add({
       'text': text,
       'authorName': authorName,
       'authorUid': authorUid,
-      'visibility': visibility,
+      'recipient': recipient,
       'prayingCount': 0,
       'prayingUids': [],
       'timestamp': Timestamp.fromDate(DateTime.now()),

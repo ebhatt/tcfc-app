@@ -19,7 +19,7 @@ class SubmitPrayerScreen extends StatefulWidget {
 class _SubmitPrayerScreenState extends State<SubmitPrayerScreen> {
   final _formKey = GlobalKey<FormState>();
   final _textCtrl = TextEditingController();
-  String _visibility = 'public';
+  String _recipient = 'prayer_ministry';
   bool _loading = false;
   final _prayerService = PrayerService();
 
@@ -36,7 +36,7 @@ class _SubmitPrayerScreenState extends State<SubmitPrayerScreen> {
       text: _textCtrl.text.trim(),
       authorName: widget.authorName,
       authorUid: widget.authorUid,
-      visibility: _visibility,
+      recipient: _recipient,
     );
     if (mounted) Navigator.pop(context);
   }
@@ -75,21 +75,21 @@ class _SubmitPrayerScreenState extends State<SubmitPrayerScreen> {
               ),
               const SizedBox(height: 8),
               _VisibilityOption(
-                value: 'public',
-                groupValue: _visibility,
+                value: 'prayer_ministry',
+                groupValue: _recipient,
                 icon: Icons.volunteer_activism,
                 title: 'Prayer Ministry',
                 subtitle: 'Christina Choppala · Shared with the prayer team',
-                onChanged: (v) => setState(() => _visibility = v!),
+                onChanged: (v) => setState(() => _recipient = v!),
               ),
               const SizedBox(height: 8),
               _VisibilityOption(
                 value: 'private',
-                groupValue: _visibility,
+                groupValue: _recipient,
                 icon: Icons.lock_outline,
                 title: 'Pastor',
                 subtitle: 'Rev. Rufus Bhimanapalli · Private and confidential',
-                onChanged: (v) => setState(() => _visibility = v!),
+                onChanged: (v) => setState(() => _recipient = v!),
               ),
               const SizedBox(height: 32),
               _loading

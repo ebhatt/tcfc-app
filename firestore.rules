@@ -15,6 +15,14 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == uid;
     }
 
+    function isPastorEmail() {
+      return isSignedIn() && request.auth.token.email == 'pastor@tcfcva.com';
+    }
+
+    function isPrayerMinistryEmail() {
+      return isSignedIn() && request.auth.token.email == 'prayerministry@tcfcva.com';
+    }
+
     // Users can read/write their own document; leaders can read all
     // Leaders can also update only the role field on any user document
     match /users/{uid} {
@@ -31,17 +39,19 @@ service cloud.firestore {
     }
 
     // Prayer requests:
-    // - Public: anyone can read; authenticated users can create
-    // - Private: only leaders and author can read
-    // - Only author or leader can delete
-    // - Only prayingCount and prayingUids fields can be updated by signed-in users
+    // - Pastor requests: only the author and pastor@tcfcva.com can read
+    // - Prayer Ministry requests: only the author and prayerministry@tcfcva.com can read
+    // - Only author can delete their own request
+    // - Only recipient leader can update prayingCount/prayingUids
     match /prayerRequests/{requestId} {
-      allow read: if resource.data.visibility == 'public'
-                  || isLeader()
-                  || isOwner(resource.data.authorUid);
+      allow read: if isOwner(resource.data.authorUid)
+                  || (resource.data.recipient == 'pastor' && isPastorEmail())
+                  || (resource.data.recipient == 'prayer_ministry' && isPrayerMinistryEmail());
       allow create: if isSignedIn();
-      allow delete: if isOwner(resource.data.authorUid) || isLeader();
-      allow update: if isSignedIn() &&
+      allow delete: if isOwner(resource.data.authorUid)
+                    || (resource.data.recipient == 'pastor' && isPastorEmail())
+                    || (resource.data.recipient == 'prayer_ministry' && isPrayerMinistryEmail());
+      allow update: if (isPastorEmail() || isPrayerMinistryEmail()) &&
                       request.resource.data.diff(resource.data).affectedKeys()
                         .hasOnly(['prayingCount', 'prayingUids']);
     }
