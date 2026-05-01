@@ -66,7 +66,7 @@ class _SubmitPrayerScreenState extends State<SubmitPrayerScreen> {
               ),
               const SizedBox(height: 24),
               const Text(
-                'VISIBILITY',
+                'SEND TO',
                 style: TextStyle(
                     fontSize: 11,
                     color: AppTheme.primary,
@@ -77,16 +77,18 @@ class _SubmitPrayerScreenState extends State<SubmitPrayerScreen> {
               _VisibilityOption(
                 value: 'public',
                 groupValue: _visibility,
-                title: 'Share with congregation',
-                subtitle: 'Everyone can pray with you',
+                icon: Icons.volunteer_activism,
+                title: 'Prayer Ministry',
+                subtitle: 'Christina Choppala · Shared with the prayer team',
                 onChanged: (v) => setState(() => _visibility = v!),
               ),
               const SizedBox(height: 8),
               _VisibilityOption(
                 value: 'private',
                 groupValue: _visibility,
-                title: 'Private — leaders only',
-                subtitle: 'Only pastors will see this',
+                icon: Icons.lock_outline,
+                title: 'Pastor',
+                subtitle: 'Rev. Rufus Bhimanapalli · Private and confidential',
                 onChanged: (v) => setState(() => _visibility = v!),
               ),
               const SizedBox(height: 32),
@@ -107,6 +109,7 @@ class _SubmitPrayerScreenState extends State<SubmitPrayerScreen> {
 class _VisibilityOption extends StatelessWidget {
   final String value;
   final String groupValue;
+  final IconData icon;
   final String title;
   final String subtitle;
   final ValueChanged<String?> onChanged;
@@ -114,6 +117,7 @@ class _VisibilityOption extends StatelessWidget {
   const _VisibilityOption({
     required this.value,
     required this.groupValue,
+    required this.icon,
     required this.title,
     required this.subtitle,
     required this.onChanged,
@@ -138,11 +142,13 @@ class _VisibilityOption extends StatelessWidget {
         child: Row(
           children: [
             Icon(
-              selected
-                  ? Icons.radio_button_checked
-                  : Icons.radio_button_off,
+              selected ? Icons.radio_button_checked : Icons.radio_button_off,
               color: selected ? AppTheme.primary : Colors.grey,
             ),
+            const SizedBox(width: 4),
+            Icon(icon,
+                color: selected ? AppTheme.primary : Colors.grey,
+                size: 20),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
